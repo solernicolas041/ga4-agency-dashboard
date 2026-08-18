@@ -1,5 +1,10 @@
 # GA4 Agency Dashboard
 
+**In plain terms:** one page where you see the Analytics numbers of every client you manage,
+side by side, without opening GA4 account by account. It is free, it runs on your own Google
+account, and it warns you when a client's data stopped coming in — the failure GA4 never tells
+you about.
+
 A multi-client GA4 dashboard that runs entirely inside Google Apps Script — no server, no
 database, no hosting bill. Built to answer one question across a whole client roster:
 **where is the measurement leaking?**
@@ -14,7 +19,8 @@ in the interface rather than buried in a log, on every view, before anyone reads
 
 ## What it looks like
 
-All figures below are invented — three fictional accounts, no client data.
+All figures below are invented — three fictional accounts under a fictional agency name,
+no client data.
 
 **Overview** — the roster at a glance, key events broken out by type.
 
@@ -120,6 +126,23 @@ var GA4_PROPERTIES = [                // one entry per property on the dashboard
 Properties are collected in batches of eight to stay inside the execution limit. Adding a
 ninth client to a batch is fine; adding a seventeenth means adding a third batch function and
 its trigger.
+
+### Branding
+
+`AGENCY` in `config.js` carries your name through the sidebar, the browser tab, the client
+invitation, the report emails and the PNG exports. Only `name` and `productName` are used
+everywhere; leave any other field empty and it is dropped rather than rendered blank.
+
+```js
+var AGENCY = {
+  name:        'Northwind Media',
+  productName: 'Analytics Dashboard',
+  tagline:     'Attract. Convert. Scale.',   // optional
+  contactName: 'Jane Doe',                   // optional — email signature
+  contactTitle:'Head of Paid — Northwind',   // optional
+  website:     'northwindmedia.com'          // optional
+};
+```
 
 ## Files
 

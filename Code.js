@@ -1,5 +1,5 @@
 /**
- * MCC Admin Dashboard — Dr.Marketing v7.2 (Token-based Auth)
+ * Multi-client GA4 dashboard — web app server (token-based auth)
  * 
  * SECURITY MODEL:
  * ┌──────────────────────────────────────────────────────────────────┐
@@ -58,6 +58,36 @@ function isStaff_(token) {
 // ════════════════════════════════════════
 //  ROUTING — doGet
 // ════════════════════════════════════════
+// ═══ BRANDING — one source of truth, from AGENCY in config.js ═══
+function agencyName_()    { return (typeof AGENCY !== 'undefined' && AGENCY.name) || 'Analytics Dashboard'; }
+function agencyProduct_() { return (typeof AGENCY !== 'undefined' && AGENCY.productName) || 'Analytics Dashboard'; }
+function agencyTitle_()   { return agencyName_() + ' — ' + agencyProduct_(); }
+
+/** Signature block for report emails. Empty AGENCY fields are left out entirely. */
+function emailSignature_() {
+  var left = '<div style="font-size:20px;font-weight:800;color:#1a3a5c;letter-spacing:0.5px">' + agencyName_() + '</div>';
+  if (AGENCY.tagline) {
+    left += '<div style="font-size:9px;color:#5b9bd5;letter-spacing:1px;margin-top:2px">' + AGENCY.tagline + '</div>';
+  }
+  var right = '';
+  if (AGENCY.contactName) {
+    right += '<div style="font-size:18px;font-weight:700;color:#1a2a3a;margin-bottom:4px">' + AGENCY.contactName + '</div>';
+  }
+  if (AGENCY.contactTitle) {
+    right += '<div style="font-size:14px;font-weight:600;color:#5b9bd5;margin-bottom:8px">' + AGENCY.contactTitle + '</div>';
+  }
+  if (AGENCY.website) {
+    var href = AGENCY.website.indexOf('http') === 0 ? AGENCY.website : 'https://' + AGENCY.website;
+    right += '<div style="font-size:13px;color:#5b9bd5">🌐 <a href="' + href + '" style="color:#5b9bd5;text-decoration:none">' + AGENCY.website + '</a></div>';
+  }
+  var h = '<div style="padding:24px 32px;border-top:1px solid #e2e8f0">';
+  h += '<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif"><tr>';
+  h += '<td style="' + (right ? 'padding-right:20px;border-right:2px solid #5b9bd5;' : '') + 'vertical-align:middle">' + left + '</td>';
+  if (right) h += '<td style="padding-left:20px;vertical-align:middle">' + right + '</td>';
+  h += '</tr></table></div>';
+  return h;
+}
+
 function doGet(e) {
   var urlToken = (e && e.parameter && e.parameter.t) ? String(e.parameter.t).trim() : '';
   
@@ -98,8 +128,9 @@ function serveDashboard_(auth, sessionToken) {
   template.authPages = JSON.stringify(auth.pages || []);
   template.userEmail = auth.email || '';
   template.sessionToken = sessionToken;
+  template.agencyJson = JSON.stringify(typeof AGENCY !== 'undefined' ? AGENCY : {});
   return template.evaluate()
-    .setTitle('MCC Dashboard — GA4 Analytics')
+    .setTitle(agencyTitle_())
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
@@ -114,10 +145,10 @@ function accessDeniedPage_(reason, debug) {
     '.debug{margin-top:20px;padding:12px;background:#0f172a;border-radius:8px;font-size:11px;color:#475569;text-align:left}' +
     '</style></head><body><div class="box">' +
     '<h1>🔒</h1><h2>Access Denied</h2>' +
-    '<p>' + reason + '</p><p>Contact Dr.Marketing to request access.</p>' +
+    '<p>' + reason + '</p><p>Contact ' + agencyName_() + ' to request access.</p>' +
     '<div class="debug">' + (debug || '') + '</div>' +
     '</div></body></html>'
-  ).setTitle('Access Denied — Dr.Marketing');
+  ).setTitle('Access Denied — ' + agencyName_());
 }
 
 // ════════════════════════════════════════
@@ -370,7 +401,7 @@ function sendInviteEmail(token, email, name) {
   
   var htmlBody = '<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;padding:30px">' +
     '<div style="background:#16213E;padding:20px;border-radius:12px 12px 0 0;text-align:center">' +
-    '<h1 style="color:#fff;margin:0;font-size:22px">📊 Dr.Marketing</h1></div>' +
+    '<h1 style="color:#fff;margin:0;font-size:22px">📊 ' + agencyName_() + '</h1></div>' +
     '<div style="background:#f8fafc;padding:24px;border:1px solid #e5e7eb;border-radius:0 0 12px 12px">' +
     '<p>Hi ' + (name || 'there') + ',</p>' +
     '<p>Your performance dashboard is ready! Click the button below to access it.</p>' +
@@ -383,9 +414,9 @@ function sendInviteEmail(token, email, name) {
   try {
     MailApp.sendEmail({
       to: email,
-      subject: '📊 Your Dashboard Access — Dr.Marketing',
+      subject: '📊 Your Dashboard Access — ' + agencyName_(),
       htmlBody: htmlBody,
-      name: 'Dr.Marketing Dashboard'
+      name: agencyTitle_()
     });
     logSession_(ADMIN_EMAIL, 'admin', 'invite_sent: ' + email);
     return { success: true };
@@ -1115,7 +1146,7 @@ function sendClientReport(token, recipientEmail, recipientName, clientName, subj
   
   // Header
   fullHtml += '<div style="background:linear-gradient(135deg,#16213E,#0F3460);padding:30px 32px;text-align:center">';
-  fullHtml += '<div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:0.5px">📊 Dr.Marketing</div>';
+  fullHtml += '<div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:0.5px">📊 ' + agencyName_() + '</div>';
   fullHtml += '<div style="font-size:13px;color:#94a3b8;margin-top:4px">' + (L === 'fr' ? 'Rapport Performance' : 'Performance Report') + ' — ' + clientName + '</div>';
   fullHtml += '</div>';
   
@@ -1143,22 +1174,11 @@ function sendClientReport(token, recipientEmail, recipientName, clientName, subj
     fullHtml += '</div>';
   }
   
-  // Professional signature
-  fullHtml += '<div style="padding:24px 32px;border-top:1px solid #e2e8f0">';
-  fullHtml += '<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif"><tr>';
-  fullHtml += '<td style="padding-right:20px;border-right:2px solid #5b9bd5;vertical-align:middle">';
-  fullHtml += '<div style="font-size:20px;font-weight:800;color:#1a3a5c;letter-spacing:0.5px">SolerAds</div>';
-  fullHtml += '<div style="font-size:9px;color:#5b9bd5;letter-spacing:1px;margin-top:2px">Attract. Convert. Scale.</div>';
-  fullHtml += '</td>';
-  fullHtml += '<td style="padding-left:20px;vertical-align:middle">';
-  fullHtml += '<div style="font-size:18px;font-weight:700;color:#1a2a3a;margin-bottom:4px">Nicolas SOLER</div>';
-  fullHtml += '<div style="font-size:14px;font-weight:600;color:#5b9bd5;margin-bottom:8px">Dr.Marketing - SolerAds</div>';
-  fullHtml += '<div style="font-size:13px;color:#5b9bd5">🌐 <a href="https://solerads.com" style="color:#5b9bd5;text-decoration:none">solerads.com</a></div>';
-  fullHtml += '</td></tr></table></div>';
+  fullHtml += emailSignature_();
   
   // Footer
   fullHtml += '<div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center">';
-  fullHtml += '<div style="font-size:11px;color:#94a3b8">' + (L === 'fr' ? 'Généré par' : 'Generated by') + ' Dr.Marketing MCC Dashboard</div>';
+  fullHtml += '<div style="font-size:11px;color:#94a3b8">' + (L === 'fr' ? 'Généré par ' : 'Generated by ') + agencyTitle_() + '</div>';
   fullHtml += '<div style="font-size:11px;color:#94a3b8;margin-top:4px">' + new Date().toLocaleDateString(L === 'fr' ? 'fr-FR' : 'en-AU', { year:'numeric', month:'long', day:'numeric' }) + '</div>';
   fullHtml += '</div></div></body></html>';
   
@@ -1169,7 +1189,7 @@ function sendClientReport(token, recipientEmail, recipientName, clientName, subj
       cc: ADMIN_EMAIL,
       subject: subject,
       htmlBody: fullHtml,
-      name: 'Dr.Marketing — Nico',
+      name: agencyName_(),
       replyTo: ADMIN_EMAIL
     };
     
@@ -1346,7 +1366,7 @@ function sendScheduledReports_(period) {
         cc: ADMIN_EMAIL,
         subject: subject,
         htmlBody: buildEmailWrapper_(reportHtml, clientName, greeting, closing, lang),
-        name: 'Dr.Marketing — Nico',
+        name: agencyName_(),
         replyTo: ADMIN_EMAIL
       };
       
@@ -1541,7 +1561,7 @@ function buildEmailWrapper_(bodyHtml, clientName, greeting, closing, lang) {
   var h = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif">';
   h += '<div style="max-width:700px;margin:0 auto;background:#ffffff">';
   h += '<div style="background:linear-gradient(135deg,#16213E,#0F3460);padding:30px 32px;text-align:center">';
-  h += '<div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:0.5px">📊 Dr.Marketing</div>';
+  h += '<div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:0.5px">📊 ' + agencyName_() + '</div>';
   h += '<div style="font-size:13px;color:#94a3b8;margin-top:4px">' + (lang === 'fr' ? 'Rapport Performance' : 'Performance Report') + ' — ' + clientName + '</div>';
   h += '</div>';
   if (greeting) {
@@ -1553,18 +1573,9 @@ function buildEmailWrapper_(bodyHtml, clientName, greeting, closing, lang) {
     h += '<div style="padding:16px 32px;background:#f8fafc;border-left:4px solid #16a34a;margin:0 32px 12px;border-radius:0 8px 8px 0">';
     h += '<div style="font-size:13px;color:#1e293b;line-height:1.6">' + closing + '</div></div>';
   }
-  h += '<div style="padding:24px 32px;border-top:1px solid #e2e8f0">';
-  h += '<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif"><tr>';
-  h += '<td style="padding-right:20px;border-right:2px solid #5b9bd5;vertical-align:middle">';
-  h += '<div style="font-size:20px;font-weight:800;color:#1a3a5c;letter-spacing:0.5px">SolerAds</div>';
-  h += '<div style="font-size:9px;color:#5b9bd5;letter-spacing:1px;margin-top:2px">Attract. Convert. Scale.</div></td>';
-  h += '<td style="padding-left:20px;vertical-align:middle">';
-  h += '<div style="font-size:18px;font-weight:700;color:#1a2a3a;margin-bottom:4px">Nicolas SOLER</div>';
-  h += '<div style="font-size:14px;font-weight:600;color:#5b9bd5;margin-bottom:8px">Dr.Marketing - SolerAds</div>';
-  h += '<div style="font-size:13px;color:#5b9bd5">🌐 <a href="https://solerads.com" style="color:#5b9bd5;text-decoration:none">solerads.com</a></div>';
-  h += '</td></tr></table></div>';
+  h += emailSignature_();
   h += '<div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center">';
-  h += '<div style="font-size:11px;color:#94a3b8">' + (lang === 'fr' ? 'Rapport automatique — Dr.Marketing MCC Dashboard' : 'Automated report — Dr.Marketing MCC Dashboard') + '</div>';
+  h += '<div style="font-size:11px;color:#94a3b8">' + (lang === 'fr' ? 'Rapport automatique — ' : 'Automated report — ') + agencyTitle_() + '</div>';
   h += '<div style="font-size:11px;color:#94a3b8;margin-top:4px">' + new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-AU', { year:'numeric', month:'long', day:'numeric' }) + '</div>';
   h += '</div></div></body></html>';
   return h;

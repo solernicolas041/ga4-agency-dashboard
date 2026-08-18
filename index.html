@@ -204,8 +204,8 @@
   <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileMenu()"></div>
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <h2 id="sidebar-title">📊 Dr.Marketing</h2>
-      <p id="sidebar-subtitle">MCC Dashboard</p>
+      <h2 id="sidebar-title"></h2>
+      <p id="sidebar-subtitle"></p>
     </div>
     
     <div class="mode-toggle" id="mode-toggle">
@@ -274,6 +274,13 @@ var dateFrom = '';
 var dateTo = '';
 var chartInstances = {};
 var dashboardMode = 'admin';
+var AGENCY = <?= agencyJson ?>;
+var AGENCY_NAME    = AGENCY.name || 'Analytics Dashboard';
+var AGENCY_PRODUCT = AGENCY.productName || 'Analytics Dashboard';
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('sidebar-title').textContent = '📊 ' + AGENCY_NAME;
+  document.getElementById('sidebar-subtitle').textContent = AGENCY_PRODUCT;
+});
 var AUTH_LEVEL = '<?= authLevel ?>';
 var AUTH_NAME = '<?= authName ?>';
 var AUTH_ROLE = '<?= authRole ?>';
@@ -3212,12 +3219,12 @@ function renderQuality() {
     html += '<td class="num"><span class="badge ' + (ctrPct > 50 ? 'red' : 'yellow') + '">' + totalCtrBelow + '/' + lpAllKw.length + '</span></td>';
     html += '<td class="num">' + ctrPct + '%</td>';
     html += '<td><span style="background:#fff7ed;color:#ea580c;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">' + (LANG==='fr' ? 'MOYEN' : 'MEDIUM') + '</span></td>';
-    html += '<td><span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🔧 Dr.Marketing</span></td></tr>';
+    html += '<td><span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🔧 ' + AGENCY_NAME + '</span></td></tr>';
     html += '<tr><td><strong>✏️ Ad Relevance</strong></td>';
     html += '<td class="num"><span class="badge ' + (adPct > 30 ? 'yellow' : 'green') + '">' + totalAdBelow + '/' + lpAllKw.length + '</span></td>';
     html += '<td class="num">' + adPct + '%</td>';
     html += '<td><span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">' + (LANG==='fr' ? 'BAS' : 'LOW') + '</span></td>';
-    html += '<td><span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🔧 Dr.Marketing</span></td></tr>';
+    html += '<td><span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🔧 ' + AGENCY_NAME + '</span></td></tr>';
     html += '</tbody></table>';
     html += '</div>';
     
@@ -3336,7 +3343,7 @@ function renderQuality() {
         
         if (hasCtrIssue) {
           html += '<div style="padding:10px 14px;background:#eff6ff;border-radius:8px;border-left:3px solid #1e40af;margin-bottom:8px">';
-          html += '<div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:4px">📈 Expected CTR — <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:10px">🔧 Dr.Marketing</span></div>';
+          html += '<div style="font-size:12px;font-weight:700;color:#1e40af;margin-bottom:4px">📈 Expected CTR — <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:10px">🔧 ' + AGENCY_NAME + '</span></div>';
           html += '<div style="font-size:12px;color:#334155;line-height:1.6">';
           html += (LANG==='fr'
             ? '1. <strong>Titres :</strong> Inclure le keyword exact dans les titres d\'annonces.<br>'
@@ -3350,7 +3357,7 @@ function renderQuality() {
         
         if (hasAdIssue) {
           html += '<div style="padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a;margin-bottom:8px">';
-          html += '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-bottom:4px">✏️ Ad Relevance — <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:10px">🔧 Dr.Marketing</span></div>';
+          html += '<div style="font-size:12px;font-weight:700;color:#16a34a;margin-bottom:4px">✏️ Ad Relevance — <span style="background:#f0fdf4;color:#16a34a;padding:1px 6px;border-radius:3px;font-size:10px">🔧 ' + AGENCY_NAME + '</span></div>';
           html += '<div style="font-size:12px;color:#334155;line-height:1.6">';
           html += (LANG==='fr'
             ? '1. <strong>Copy :</strong> Aligner titres et descriptions avec les keywords ciblés.<br>'
@@ -3505,7 +3512,7 @@ function emailQsReport() {
     }
     if (g.adBelow > 0 || g.ctrBelow > 0) {
       body += '<div style="margin:0 16px 16px;padding:12px;border-radius:8px;background:#eff6ff;border-left:3px solid #1e40af;font-size:12px;line-height:1.7">';
-      body += '<strong>' + (L === 'fr' ? 'Action Dr.Marketing — Annonces' : 'Dr.Marketing Action — Ads') + '</strong><br>';
+      body += '<strong>' + (L === 'fr' ? AGENCY_NAME + ' — Annonces' : AGENCY_NAME + ' Action — Ads') + '</strong><br>';
       body += (L === 'fr' ? 'Nous ameliorons les titres, descriptions et extensions. En cours.' : 'We are improving headlines, descriptions and extensions. In progress.');
       body += '</div>';
     }
@@ -5333,8 +5340,8 @@ var RPT_TEMPLATES = {
     en: '\nWould you like to schedule a quick call to discuss these results in detail? I\'m available this week — just let me know what works for you.',
     fr: '\nSouhaitez-vous planifier un appel rapide pour discuter de ces résultats en détail ? Je suis disponible cette semaine — dites-moi ce qui vous convient.' },
   closing_thanks:  { icon: '🙏', cat: 'closing', label: 'Thank You & Sign-off', label_fr: 'Remerciement & Signature',
-    en: '\nThank you for your trust. We\'re committed to delivering the best possible results for your campaigns.\n\nBest regards,\nNico — Dr.Marketing',
-    fr: '\nMerci pour votre confiance. Nous nous engageons à obtenir les meilleurs résultats possibles pour vos campagnes.\n\nCordialement,\nNico — Dr.Marketing' }
+    en: '\nThank you for your trust. We\'re committed to delivering the best possible results for your campaigns.\n\nBest regards,\n' + AGENCY_NAME,
+    fr: '\nMerci pour votre confiance. Nous nous engageons à obtenir les meilleurs résultats possibles pour vos campagnes.\n\nCordialement,\n' + AGENCY_NAME }
 };
 
 function rptGetTemplateCategories() {
@@ -5968,7 +5975,7 @@ function rptShowPreview() {
   
   var previewHtml = '<div style="max-width:700px;margin:0 auto;background:#fff">';
   previewHtml += '<div style="background:linear-gradient(135deg,#16213E,#0F3460);padding:24px 28px;text-align:center">';
-  previewHtml += '<div style="font-size:22px;font-weight:700;color:#fff">📊 Dr.Marketing</div>';
+  previewHtml += '<div style="font-size:22px;font-weight:700;color:#fff">📊 ' + AGENCY_NAME + '</div>';
   previewHtml += '<div style="font-size:12px;color:#94a3b8;margin-top:4px">' + (lang==='fr' ? 'Rapport Performance' : 'Performance Report') + ' — ' + client + '</div>';
   previewHtml += '</div>';
   
@@ -6005,17 +6012,17 @@ function rptShowPreview() {
   previewHtml += '<div style="padding:20px 28px;border-top:1px solid #e2e8f0">';
   previewHtml += '<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif"><tr>';
   previewHtml += '<td style="padding-right:16px;border-right:2px solid #5b9bd5;vertical-align:middle">';
-  previewHtml += '<div style="font-size:18px;font-weight:800;color:#1a3a5c;letter-spacing:0.5px">SolerAds</div>';
-  previewHtml += '<div style="font-size:8px;color:#5b9bd5;letter-spacing:1px;margin-top:2px">Attract. Convert. Scale.</div>';
+  previewHtml += '<div style="font-size:18px;font-weight:800;color:#1a3a5c;letter-spacing:0.5px">' + AGENCY_NAME + '</div>';
+  if (AGENCY.tagline) previewHtml += '<div style="font-size:8px;color:#5b9bd5;letter-spacing:1px;margin-top:2px">' + AGENCY.tagline + '</div>';
   previewHtml += '</td>';
   previewHtml += '<td style="padding-left:16px;vertical-align:middle">';
-  previewHtml += '<div style="font-size:16px;font-weight:700;color:#1a2a3a">Nicolas SOLER</div>';
-  previewHtml += '<div style="font-size:13px;font-weight:600;color:#5b9bd5;margin:2px 0 6px">Dr.Marketing - SolerAds</div>';
-  previewHtml += '<div style="font-size:12px;color:#5b9bd5">🌐 solerads.com</div>';
+  if (AGENCY.contactName) previewHtml += '<div style="font-size:16px;font-weight:700;color:#1a2a3a">' + AGENCY.contactName + '</div>';
+  if (AGENCY.contactTitle) previewHtml += '<div style="font-size:13px;font-weight:600;color:#5b9bd5;margin:2px 0 6px">' + AGENCY.contactTitle + '</div>';
+  if (AGENCY.website) previewHtml += '<div style="font-size:12px;color:#5b9bd5">🌐 ' + AGENCY.website + '</div>';
   previewHtml += '</td></tr></table></div>';
   
   previewHtml += '<div style="padding:16px 28px;background:#f8fafc;text-align:center;font-size:11px;color:#94a3b8">';
-  previewHtml += (lang==='fr' ? 'Généré par' : 'Generated by') + ' Dr.Marketing MCC Dashboard — ' + new Date().toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-AU') + '</div></div>';
+  previewHtml += (lang==='fr' ? 'Généré par ' : 'Generated by ') + AGENCY_NAME + ' — ' + new Date().toLocaleDateString(lang==='fr' ? 'fr-FR' : 'en-AU') + '</div></div>';
   
   document.getElementById('rpt-modal-body').innerHTML = previewHtml;
   document.getElementById('rpt-modal').classList.add('show');
@@ -7336,7 +7343,7 @@ function exportPage() {
       ctx.fillRect(0, 0, wrapper.width, 70);
       ctx.font = 'bold 28px -apple-system, sans-serif';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText('📊 Dr.Marketing — ' + (document.getElementById('page-title').textContent || ''), pad, 45);
+      ctx.fillText('📊 ' + AGENCY_NAME + ' — ' + (document.getElementById('page-title').textContent || ''), pad, 45);
       
       // Subtitle with date & filter
       ctx.font = '16px -apple-system, sans-serif';
@@ -7352,7 +7359,7 @@ function exportPage() {
       ctx.fillRect(0, wrapper.height - 35, wrapper.width, 35);
       ctx.font = '12px -apple-system, sans-serif';
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Generated by Dr.Marketing MCC Dashboard — ' + dateStr, pad, wrapper.height - 12);
+      ctx.fillText('Generated by ' + AGENCY_NAME + ' — ' + dateStr, pad, wrapper.height - 12);
       
       // Download
       var link = document.createElement('a');
