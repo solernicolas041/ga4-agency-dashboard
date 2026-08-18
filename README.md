@@ -12,6 +12,28 @@ in the interface rather than buried in a log, on every view, before anyone reads
 > Status: extracted from a production install running 16 GA4 properties daily. Published as a
 > reference implementation — read it, fork it, take the parts you want.
 
+## What it looks like
+
+All figures below are invented — three fictional accounts, no client data.
+
+**Overview** — the roster at a glance, key events broken out by type.
+
+![Overview](docs/01-overview.png)
+
+**Channels** — engagement and bounce per source, so a cheap channel that never engages
+stops hiding inside a good-looking total. The amber banner is the point of the tool: one
+account's last collection failed, and every view says so before you read a number.
+
+![Channels](docs/02-channels.png)
+
+**Landing pages** — arrivals by page for one channel at a time, exportable to CSV.
+
+![Landing pages](docs/03-landing-pages.png)
+
+**Access** — one URL per client, scoped to their own property, revocable and expiring.
+
+![Access](docs/04-access.png)
+
 ---
 
 ## What it does
